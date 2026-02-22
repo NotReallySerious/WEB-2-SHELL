@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ember & Oak — Artisan Coffee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">Ember <span>&amp;</span> Oak</div>
+  <ul class="nav-links">
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#specials">Specials</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#visit">Visit Us</a></li>
+    <li><a href="#visit" class="nav-cta">Reserve</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-left">
+    <p class="hero-tag">Est. 2018 · Portland, Oregon</p>
+    <h1 class="hero-title">Every Cup<br>Tells a<br><em>Story.</em></h1>
+    <p class="hero-sub">We source single-origin beans from the world's finest farms, roasting in small batches to craft coffee that lingers long after the last sip.</p>
+    <div class="hero-btns">
+      <a href="#menu" class="btn-primary">Explore Menu</a>
+      <a href="#about" class="btn-outline">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80" alt="Coffee being poured">
+    <div class="hero-badge">
+      <strong>4.9★</strong>
+      Rated Best Coffee in PDX
+    </div>
+  </div>
+</section>
+
+<!-- ─── MARQUEE ─── -->
+<div class="marquee-bar">
+  <div class="marquee-track" id="marqueeTrack">
+    <span>Single Origin</span><span class="dot">✦</span>
+    <span>Small Batch Roasts</span><span class="dot">✦</span>
+    <span>Seasonal Specials</span><span class="dot">✦</span>
+    <span>Cold Brew on Tap</span><span class="dot">✦</span>
+    <span>Plant-Based Options</span><span class="dot">✦</span>
+    <span>Artisan Pastries</span><span class="dot">✦</span>
+    <span>Award-Winning Baristas</span><span class="dot">✦</span>
+    <span>Specialty Lattes</span><span class="dot">✦</span>
+    <span>Single Origin</span><span class="dot">✦</span>
+    <span>Small Batch Roasts</span><span class="dot">✦</span>
+    <span>Seasonal Specials</span><span class="dot">✦</span>
+    <span>Cold Brew on Tap</span><span class="dot">✦</span>
+    <span>Plant-Based Options</span><span class="dot">✦</span>
+    <span>Artisan Pastries</span><span class="dot">✦</span>
+    <span>Award-Winning Baristas</span><span class="dot">✦</span>
+    <span>Specialty Lattes</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- ─── ABOUT ─── -->
+<section id="about">
+  <div class="about-imgs reveal">
+    <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&q=80" alt="Barista">
+    <img src="https://images.unsplash.com/photo-1513267048331-5611cad62e41?w=400&q=80" alt="Coffee beans">
+    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80" alt="Espresso">
+    <img src="https://images.unsplash.com/photo-1529892485617-25f63cd7b1e9?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&q=80" alt="Latte art">
+  </div>
+  <div class="about-text reveal">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">Rooted in <em>passion,</em> brewed with care</h2>
+    <p>Ember &amp; Oak was born from a single, stubborn obsession: that a perfect cup of coffee could change the texture of your morning. We partner directly with farmers in Ethiopia, Colombia, and Guatemala, paying fair prices for beans that carry the story of their soil.</p>
+    <p>Our roastery sits next door to the café. You can smell tomorrow's beans while you sip today's espresso. That closeness is intentional — it keeps us honest, curious, and endlessly improving.</p>
+    <div class="about-stats">
+      <div>
+        <span class="stat-num">12+</span>
+        <span class="stat-lbl">Countries Sourced</span>
+      </div>
+      <div>
+        <span class="stat-num">6</span>
+        <span class="stat-lbl">Years Roasting</span>
+      </div>
+      <div>
+        <span class="stat-num">40k</span>
+        <span class="stat-lbl">Happy Regulars</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SPECIALS CAROUSEL ─── -->
+<section id="specials" class="section">
+  <p class="section-label reveal">Chef's Picks</p>
+  <h2 class="section-title reveal">Seasonal <em>Specials</em></h2>
+  <div class="carousel-wrapper reveal">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-card">
+        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80" alt="Iced Caramel Latte">
+        <div class="cc-body">
+          <p class="cc-tag">Spring Special</p>
+          <h3 class="cc-name">Honey Blossom Latte</h3>
+          <p class="cc-desc">Espresso with wildflower honey, lavender foam and a touch of orange zest. Served over ice.</p>
+          <span class="cc-price">$6.50</span>
+        </div>
+      </div>
+      <div class="carousel-card">
+        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80" alt="Cold Brew">
+        <div class="cc-body">
+          <p class="cc-tag">Fan Favorite</p>
+          <h3 class="cc-name">Midnight Cold Brew</h3>
+          <p class="cc-desc">18-hour steeped Guatemalan dark roast with vanilla cream float. Intense, smooth, unforgettable.</p>
+          <span class="cc-price">$5.75</span>
+        </div>
+      </div>
+      <div class="carousel-card">
+        <img src="https://images.unsplash.com/photo-1749280447307-31a68eb38673?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=500&q=80" alt="Matcha Latte">
+        <div class="cc-body">
+          <p class="cc-tag">New Arrival</p>
+          <h3 class="cc-name">Ember Matcha</h3>
+          <p class="cc-desc">Ceremonial-grade matcha with oat milk and a shot of our house espresso. Earth meets fire.</p>
+          <span class="cc-price">$6.00</span>
+        </div>
+      </div>
+      <div class="carousel-card">
+        <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600&q=80" alt="Cinnamon Roll">
+        <div class="cc-body">
+          <p class="cc-tag">Bakery Special</p>
+          <h3 class="cc-name">Cardamom Morning Bun</h3>
+          <p class="cc-desc">Flaky, buttery pastry with cardamom sugar and brown butter glaze. Baked fresh daily at 6am.</p>
+          <span class="cc-price">$4.25</span>
+        </div>
+      </div>
+      <div class="carousel-card">
+        <img src="https://images.unsplash.com/photo-1596515544823-5a0c27e4ae8a?w=600&q=80" alt="Pourover">
+        <div class="cc-body">
+          <p class="cc-tag">Single Origin</p>
+          <h3 class="cc-name">Ethiopian Pour-Over</h3>
+          <p class="cc-desc">Yirgacheffe natural process. Blueberry, jasmine, bergamot. Every pour a ritual.</p>
+          <span class="cc-price">$7.50</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-nav">
+    <button class="car-btn" id="carPrev">&#8592;</button>
+    <button class="car-btn" id="carNext">&#8594;</button>
+    <div class="carousel-dots" id="carDots"></div>
+  </div>
+</section>
+
+<!-- ─── MENU ─── -->
+<section id="menu">
+  <p class="section-label">What We Brew</p>
+  <h2 class="section-title">The Full <em>Menu</em></h2>
+  <div class="menu-tabs">
+    <button class="tab-btn active" data-tab="espresso">Espresso Drinks</button>
+    <button class="tab-btn" data-tab="cold">Cold Drinks</button>
+    <button class="tab-btn" data-tab="food">Food</button>
+    <button class="tab-btn" data-tab="beans">Beans &amp; Retail</button>
+  </div>
+
+  <!-- Espresso -->
+  <div class="menu-grid active" id="tab-espresso">
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&q=80" alt="Espresso">
+      <div class="mc-body">
+        <h3 class="mc-name">Classic Espresso</h3>
+        <p class="mc-desc">Double shot of our house blend. Bold, balanced, a velvet finish.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$3.25</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=500&q=80" alt="Cappuccino">
+      <div class="mc-body">
+        <h3 class="mc-name">Oak Cappuccino</h3>
+        <p class="mc-desc">Equal thirds espresso, steamed milk, and microfoam. Textbook perfect.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$4.50</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+      <div class="mc-badge">Popular</div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1680381792123-676305af82d8?q=80&w=928&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=500&q=80" alt="Latte">
+      <div class="mc-body">
+        <h3 class="mc-name">House Latte</h3>
+        <p class="mc-desc">Silky steamed milk over espresso, finished with a rosette. Pure elegance.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$5.00</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500&q=80" alt="Cortado">
+      <div class="mc-body">
+        <h3 class="mc-name">Cortado</h3>
+        <p class="mc-desc">Espresso tempered by equal parts warm milk. No foam. Just clarity.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$4.00</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1662047102608-a6f2e492411f?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=500&q=80" alt="Macchiato">
+      <div class="mc-body">
+        <h3 class="mc-name">Caramel Macchiato</h3>
+        <p class="mc-desc">Vanilla-infused milk, espresso drizzled over, finished with housemade caramel.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$5.75</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+      <div class="mc-badge">New</div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=500&q=80" alt="Mocha">
+      <div class="mc-body">
+        <h3 class="mc-name">Dark Chocolate Mocha</h3>
+        <p class="mc-desc">House espresso with 72% dark chocolate, steamed oat milk. Indulgence done right.</p>
+        <div class="mc-footer">
+          <span class="mc-price">$5.50</span>
+          <button class="mc-add">Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cold Drinks -->
+  <div class="menu-grid" id="tab-cold">
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=500&q=80" alt="Cold Brew">
+      <div class="mc-body">
+        <h3 class="mc-name">Cold Brew</h3>
+        <p class="mc-desc">18-hour cold steeped Guatemalan dark roast. Bold and smooth on ice.</p>
+        <div class="mc-footer"><span class="mc-price">$5.25</span><button class="mc-add">Order</button></div>
+      </div>
+      <div class="mc-badge">Popular</div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=500&q=80" alt="Iced Latte">
+      <div class="mc-body">
+        <h3 class="mc-name">Iced Latte</h3>
+        <p class="mc-desc">Double espresso over ice with your milk of choice. The evergreen classic.</p>
+        <div class="mc-footer"><span class="mc-price">$5.00</span><button class="mc-add">Order</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1644764399224-f7d18b1e8d1c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=500&q=80" alt="Nitro">
+      <div class="mc-body">
+        <h3 class="mc-name">Nitro Cold Brew</h3>
+        <p class="mc-desc">Cold brew infused with nitrogen for a creamy, Guinness-like pour. No milk needed.</p>
+        <div class="mc-footer"><span class="mc-price">$6.00</span><button class="mc-add">Order</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Food -->
+  <div class="menu-grid" id="tab-food">
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=500&q=80" alt="Croissant">
+      <div class="mc-body">
+        <h3 class="mc-name">Butter Croissant</h3>
+        <p class="mc-desc">Laminated dough, 72 layers of French butter. Baked fresh every morning.</p>
+        <div class="mc-footer"><span class="mc-price">$3.75</span><button class="mc-add">Order</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=500&q=80" alt="Avocado Toast">
+      <div class="mc-body">
+        <h3 class="mc-name">Avocado Toast</h3>
+        <p class="mc-desc">Sourdough, smashed avocado, radish, sesame, chili flakes, lemon.</p>
+        <div class="mc-footer"><span class="mc-price">$9.00</span><button class="mc-add">Order</button></div>
+      </div>
+      <div class="mc-badge">Brunch</div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=500&q=80" alt="Granola bowl">
+      <div class="mc-body">
+        <h3 class="mc-name">Granola Yoghurt Bowl</h3>
+        <p class="mc-desc">House granola, Greek yoghurt, seasonal fruit compote and local honey drizzle.</p>
+        <div class="mc-footer"><span class="mc-price">$8.50</span><button class="mc-add">Order</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Beans -->
+  <div class="menu-grid" id="tab-beans">
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=500&q=80" alt="Coffee bag">
+      <div class="mc-body">
+        <h3 class="mc-name">House Blend — 250g</h3>
+        <p class="mc-desc">Our signature medium roast: chocolate, walnut, dried cherry. Versatile and beautiful.</p>
+        <div class="mc-footer"><span class="mc-price">$18.00</span><button class="mc-add">Buy</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&q=80" alt="Ethiopian beans">
+      <div class="mc-body">
+        <h3 class="mc-name">Ethiopian Yirgacheffe — 250g</h3>
+        <p class="mc-desc">Natural process, light roast: blueberry, jasmine, black tea. Extraordinary origin.</p>
+        <div class="mc-footer"><span class="mc-price">$22.00</span><button class="mc-add">Buy</button></div>
+      </div>
+      <div class="mc-badge">Best Seller</div>
+    </div>
+    <div class="menu-card reveal">
+      <img class="mc-img" src="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=500&q=80" alt="Colombia beans">
+      <div class="mc-body">
+        <h3 class="mc-name">Colombia Huila — 250g</h3>
+        <p class="mc-desc">Washed process, medium roast: caramel, red apple, brown sugar. Approachable perfection.</p>
+        <div class="mc-footer"><span class="mc-price">$20.00</span><button class="mc-add">Buy</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section id="testimonials">
+  <p class="section-label reveal">What People Say</p>
+  <h2 class="section-title reveal">Straight from our <em>regulars</em></h2>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The Ethiopian pour-over changed how I think about coffee. I've been to third-wave shops across the country — Ember &amp; Oak is in a different league.</p>
+      <div class="testi-author">
+        <img class="testi-avatar" src="https://images.unsplash.com/photo-1592621385612-4d7129426394?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Sarah M.">
+        <div>
+          <div class="testi-name">Sarah M.</div>
+          <div class="testi-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The vibe, the music, the smell of fresh roasts — I genuinely clear my entire morning just to sit here with a cortado and my notebook.</p>
+      <div class="testi-author">
+        <img class="testi-avatar" src="https://i.pravatar.cc/80?img=33" alt="James K.">
+        <div>
+          <div class="testi-name">James K.</div>
+          <div class="testi-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Best cold brew I've had, period. I order the beans online every month — my home setup finally tastes café-quality. Worth every penny.</p>
+      <div class="testi-author">
+        <img class="testi-avatar" src="https://i.pravatar.cc/80?img=47" alt="Maya L.">
+        <div>
+          <div class="testi-name">Maya L.</div>
+          <div class="testi-stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GALLERY ─── -->
+<section id="gallery">
+  <p class="section-label reveal">Life at Ember &amp; Oak</p>
+  <h2 class="section-title reveal">The <em>Gallery</em></h2>
+  <div class="gallery-reel">
+    <img src="https://images.unsplash.com/photo-1511081692775-05d0f180a065?w=600&q=80" alt="Café interior">
+    <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&q=80" alt="Barista at work">
+    <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=600&q=80" alt="Coffee art">
+    <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&q=80" alt="Coffee beans">
+    <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80" alt="Friends at café">
+    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=80" alt="Working in café">
+    <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=80" alt="Pour over">
+  </div>
+</section>
+
+<!-- ─── VISIT ─── -->
+<section id="visit">
+  <div class="visit-info">
+    <p class="section-label" style="color:var(--caramel)">Find Us</p>
+    <h2 class="section-title">Come say <em>hello</em></h2>
+    <div class="visit-detail">
+      <span class="v-icon">📍</span>
+      <div>
+        <div class="v-label">Address</div>
+        <div class="v-val">204 NW 23rd Ave<br>Portland, Oregon 97210</div>
+      </div>
+    </div>
+    <div class="visit-detail">
+      <span class="v-icon">🕐</span>
+      <div>
+        <div class="v-label">Hours</div>
+        <div class="v-val">Mon–Fri: 6:30am – 8:00pm<br>Sat–Sun: 7:00am – 9:00pm</div>
+      </div>
+    </div>
+    <div class="visit-detail">
+      <span class="v-icon">📞</span>
+      <div>
+        <div class="v-label">Phone</div>
+        <div class="v-val">(503) 555-0192</div>
+      </div>
+    </div>
+    <div class="visit-detail">
+      <span class="v-icon">✉️</span>
+      <div>
+        <div class="v-label">Email</div>
+        <div class="v-val">hello@emberandoak.coffee</div>
+      </div>
+    </div>
+    <a href="mailto:hello@emberandoak.coffee" class="btn-primary" style="margin-top:1rem; display:inline-block;">Make a Reservation</a>
+  </div>
+  <div class="visit-map">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2795.4!2d-122.6975!3d45.5276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDMxJzM5LjQiTiAxMjLCsDQxJzUxLjAiVw!5e0!3m2!1sen!2sus!4v1234567890"
+      allowfullscreen="" loading="lazy">
+    </iframe>
+  </div>
+</section>
+
+<!-- ─── NEWSLETTER ─── -->
+<section id="newsletter">
+  <div>
+    <h2 class="section-title">Stay in the <em>loop</em></h2>
+    <p>New roasts, seasonal specials, and brewing tips — straight to your inbox.</p>
+  </div>
+  <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+    <input class="nl-input" type="email" placeholder="your@email.com" required>
+    <button class="nl-btn" type="submit">Subscribe</button>
+  </form>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">Ember <span>&amp;</span> Oak</span>
+      <p>Roasting exceptional coffee with integrity, curiosity, and a deep respect for the farmers who make it possible.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-link">𝕏</a>
+        <a href="#" class="social-link">𝕀</a>
+        <a href="#" class="social-link">𝔽</a>
+        <a href="#" class="social-link">▶</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Menu</h4>
+      <ul>
+        <li><a href="#">Espresso Drinks</a></li>
+        <li><a href="#">Cold Brew</a></li>
+        <li><a href="#">Food &amp; Pastries</a></li>
+        <li><a href="#">Retail Beans</a></li>
+        <li><a href="#">Seasonal Specials</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Sourcing Ethics</a></li>
+        <li><a href="#">Roastery Tours</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">Visit Us</a></li>
+        <li><a href="#">Wholesale</a></li>
+        <li><a href="#">Event Catering</a></li>
+        <li><a href="#">Gift Cards</a></li>
+        <li><a href="#">Newsletter</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 <span>Ember &amp; Oak Coffee</span>. All rights reserved.</p>
+    <p>Roasted with ♥ in Portland, Oregon</p>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+</body>
+</html>
