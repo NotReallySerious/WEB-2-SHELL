@@ -6,8 +6,10 @@ my computer because I simply click a perfectly normal website?
 ```
 This project will answer that question.
 
-![[web2shell-thumbnail.png]]
+<img src='https://github.com/NotReallySerious/WEB-2-SHELL/blob/main/web2shell-thumbnail.png'>
+
 ---
+
 # What is Web 2 Shell
 Web 2 Shell is a study case project meant to study a scenario where an attacker can take control another user's computer just because they open a perfectly normal website. 
 
